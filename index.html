@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>from:tianjiahe- 你的专属导航入口</title>
+    <style>
+        /* 全局样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+        }
+
+        /* 背景和主体样式 */
+        body {
+            /* 初始随机背景 */
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+            background-color: #2c3e50;
+            transition: background 0.8s ease-in-out; /* 平滑过渡 */
+            background-blend-mode: overlay;
+        }
+
+        /* 背景控制面板 - 优化样式 */
+        .bg-control-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 12px;
+            padding: 15px;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .bg-control-panel h3 {
+            color: #ff9ecc;
+            font-size: 1rem;
+            margin-bottom: 12px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .bg-control-panel h3 i {
+            font-size: 0.9em;
+        }
+
+        /* 随机按钮样式 */
+        .random-btn {
+            width: 100%;
+            padding: 8px 0;
+            border-radius: 8px;
+            border: 1px solid #ff69b4;
+            background: rgba(255, 105, 180, 0.2);
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        .random-btn:hover {
+            background: rgba(255, 105, 180, 0.4);
+            box-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+            transform: scale(1.02);
+        }
+
+        /* 自动切换开关 */
+        .auto-switch {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: #e0e0e0;
+            font-size: 0.85rem;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 36px;
+            height: 20px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #444;
+            transition: .4s;
+            border-radius: 20px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #ff69b4;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(16px);
+        }
+
+        /* 容器样式 - 透明化 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 0 30px rgba(255, 105, 180, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            margin-top: 20px;
+        }
+
+        /* 头部样式 */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(255, 105, 180, 0.5);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            color: #ff69b4;
+            text-shadow: 0 0 10px #ff69b4;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: #e0e0e0;
+            font-size: 1.1rem;
+        }
+
+        /* 导航分类样式 */
+        .nav-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        /* 分类卡片样式 - 透明化 */
+        .category-card {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            border-color: #ff69b4;
+            box-shadow: 0 8px 15px rgba(255, 105, 180, 0.2);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .category-card h2 {
+            color: #ff9ecc;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .category-card h2 i {
+            font-size: 1.2em;
+        }
+
+        /* 链接列表样式 */
+        .link-list {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .link-item {
+            margin-bottom: 8px;
+        }
+
+        .link-item a {
+            display: block;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .link-item a:hover {
+            background: rgba(255, 105, 180, 0.2);
+            color: #ffd1e8;
+            transform: translateX(5px);
+        }
+
+        /* 底部样式 - 透明化 */
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        /* 响应式适配 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                backdrop-filter: blur(4px);
+                -webkit-backdrop-filter: blur(4px);
+            }
+
+            /* 移动端调整控制面板 */
+            .bg-control-panel {
+                position: static;
+                margin: 0 auto 20px;
+                max-width: 300px;
+            }
+
+            header h1 {
+                font-size: 2rem;
+            }
+
+            .nav-categories {
+                grid-template-columns: 1fr;
+            }
+
+            .link-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <!-- 引入图标库 -->
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- 背景控制面板 - 随机切换功能 -->
+    <div class="bg-control-panel">
+        <h3><i class="fas fa-image"></i> 随机背景</h3>
+        <!-- 手动一键随机按钮 -->
+        <button class="random-btn" id="randomBgBtn">
+            <i class="fas fa-shuffle"></i>
+        </button>
+        <!-- 自动切换开关 -->
+        <div class="auto-switch">
+            <span>自动切换</span>
+            <label class="switch">
+                <input type="checkbox" id="autoSwitch">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- 导航分类主体 -->
+        <main class="nav-categories">
+            <!-- 动漫番剧分类 -->
+            <div class="category-card">
+                <h2><i class="fas fa-tv"></i> 动漫番剧</h2>
+                <ul class="link-list">
+                    <li class="link-item"><a href="https://www.bilibili.com" target="_blank">哔哩哔哩</a></li>
+                    <li class="link-item"><a href="https://www.acfun.cn" target="_blank">AcFun</a></li>
+                    <li class="link-item"><a href="https://ani.gamer.com.tw" target="_blank">巴哈姆特动画疯</a></li>
+                    <li class="link-item"><a href="https://www.iqiyi.com" target="_blank">爱奇艺动漫</a></li>
+                </ul>
+            </div>
+
+            <!-- 漫画阅读分类 -->
+            <div class="category-card">
+                <h2><i class="fas fa-book"></i> 漫画阅读</h2>
+                <ul class="link-list">
+                    <li class="link-item"><a href="https://manga.bilibili.com" target="_blank">哔哩哔哩漫画</a></li>
+                    <li class="link-item"><a href="https://www.tencent动漫.com" target="_blank">腾讯动漫</a></li>
+                    <li class="link-item"><a href="https://ac.qq.com" target="_blank">快看漫画</a></li>
+                    <li class="link-item"><a href="https://www.dmzj.com" target="_blank">动漫之家</a></li>
+                </ul>
+            </div>
+
+            <!-- 游戏专区分类 -->
+            <div class="category-card">
+                <h2><i class="fas fa-gamepad"></i> 游戏专区</h2>
+                <ul class="link-list">
+                    <li class="link-item"><a href="https://www.17173.com" target="_blank">17173游戏网</a></li>
+                    <li class="link-item"><a href="https://www.taptap.com" target="_blank">TapTap</a></li>
+                    <li class="link-item"><a href="https://game.bilibili.com" target="_blank">哔哩哔哩游戏</a></li>
+                    <li class="link-item"><a href="https://www.steamchina.com" target="_blank">蒸汽平台</a></li>
+                </ul>
+            </div>
+
+            <!-- 同人创作分类 -->
+            <div class="category-card">
+                <h2><i class="fas fa-pen-fancy"></i> 同人创作</h2>
+                <ul class="link-list">
+                    <li class="link-item"><a href="https://www.lofter.com" target="_blank">LOFTER</a></li>
+                    <li class="link-item"><a href="https://www.pixiv.net" target="_blank">Pixiv</a></li>
+                    <li class="link-item"><a href="https://www.bcy.net" target="_blank">半次元</a></li>
+                    <li class="link-item"><a href="https://cpwiki.org" target="_blank">CP百科</a></li>
+                </ul>
+            </div>
+
+            <!-- 周边商城分类 -->
+            <div class="category-card">
+                <h2><i class="fas fa-shopping-cart"></i> 周边商城</h2>
+                <ul class="link-list">
+                    <li class="link-item"><a href="https://mall.bilibili.com" target="_blank">哔哩哔哩会员购</a></li>
+                    <li class="link-item"><a href="https://www.animate-onlineshop.cn" target="_blank">Animate</a></li>
+                    <li class="link-item"><a href="https://www.taobao.com" target="_blank">淘宝二次元专区</a></li>
+                    <li class="link-item"><a href="https://www.jd.com" target="_blank">京东动漫周边</a></li>
+                </ul>
+            </div>
+
+            <!-- 声优音乐分类 -->
+            <div class="category-card">
+                <h2><i class="fas fa-music"></i> 声优音乐</h2>
+                <ul class="link-list">
+                    <li class="link-item"><a href="https://music.163.com" target="_blank">网易云音乐</a></li>
+                    <li class="link-item"><a href="https://y.qq.com" target="_blank">QQ音乐</a></li>
+                    <li class="link-item"><a href="https://www.bilibili.com/audio" target="_blank">B站音频</a></li>
+                    <li class="link-item"><a href="https://www.missevan.com" target="_blank">猫耳FM</a></li>
+                </ul>
+            </div>
+        </main>
+
+        <!-- 网站底部 -->
+        <footer>
+            <p>tianjiahe © 2026 | 用心打造专属导航体验</p>
+        </footer>
+    </div>
+
+    <script>
+        // 1. 定义二次元背景图片库（可自行添加/删除/替换链接）
+        const bgImageList = [
+            'https://picsum.photos/id/1074/1920/1080',
+            'https://hbzoss.yaash.cn/image/638164529b5fbea7@middle',
+            'https://picsum.photos/id/1062/1920/1080',
+            'https://haowallpaper.com/link/common/file/previewFileImg/17882950812224896',
+            'https://haowallpaper.com/link/common/file/previewFileImg/17187133610511744',
+            'https://haowallpaper.com/link/common/file/previewFileImg/16811532760829312',
+            'https://haowallpaper.com/link/common/file/previewFileImg/15680526683050304'
+        ];
+
+        const body = document.body;
+        let autoSwitchTimer = null; // 自动切换定时器
+        const autoSwitchTime = 10000; // 自动切换间隔（10秒，可修改，单位ms）
+
+        // 2. 随机设置背景方法
+        function setRandomBg() {
+            // 随机获取一个背景图片索引
+            const randomIndex = Math.floor(Math.random() * bgImageList.length);
+            const randomBgUrl = bgImageList[randomIndex];
+            // 设置背景（保留渐变叠加）
+            body.style.background = `url('${randomBgUrl}') center/cover no-repeat fixed, 
+                                     linear-gradient(135deg, #2c3e50 0%, #4a148c 100%)`;
+        }
+
+        // 3. 页面加载时先设置一次随机背景
+        window.onload = function() {
+            setRandomBg();
+        };
+
+        // 4. 手动一键随机按钮点击事件
+        document.getElementById('randomBgBtn').addEventListener('click', function() {
+            setRandomBg();
+            // 点击后重置自动切换定时器
+            if (document.getElementById('autoSwitch').checked) {
+                clearInterval(autoSwitchTimer);
+                startAutoSwitch();
+            }
+        });
+
+        // 5. 自动切换开关事件
+        document.getElementById('autoSwitch').addEventListener('change', function() {
+            if (this.checked) {
+                startAutoSwitch(); // 开启自动切换
+            } else {
+                clearInterval(autoSwitchTimer); // 关闭自动切换
+            }
+        });
+
+        // 6. 开启自动切换方法
+        function startAutoSwitch() {
+            autoSwitchTimer = setInterval(() => {
+                setRandomBg();
+            }, autoSwitchTime);
+        }
+    </script>
+</body>
+</html>
