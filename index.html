@@ -1,4 +1,3 @@
-@ -0,0 +1,427 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -232,6 +231,58 @@
             transform: translateX(5px);
         }
 
+        /* 下载按钮样式 */
+        .download-btn {
+            display: inline-block;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            background: rgba(66, 153, 225, 0.2);
+            border: 1px solid #4299e1;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+        }
+
+        .download-btn:hover {
+            background: rgba(66, 153, 225, 0.4);
+            color: #e3f2fd;
+            transform: translateX(5px);
+            box-shadow: 0 0 10px rgba(66, 153, 225, 0.5);
+        }
+
+        /* 批量下载按钮 */
+        .batch-download {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .batch-download-btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 1px solid #4299e1;
+            background: rgba(66, 153, 225, 0.3);
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .batch-download-btn:hover {
+            background: rgba(66, 153, 225, 0.5);
+            box-shadow: 0 0 10px rgba(66, 153, 225, 0.5);
+            transform: scale(1.05);
+        }
+
+        /* 下载资源大小提示 */
+        .file-size {
+            font-size: 0.75rem;
+            color: #999;
+            margin-left: 5px;
+        }
+
         /* 底部样式 - 透明化 */
         footer {
             text-align: center;
@@ -279,7 +330,7 @@
         <h3><i class="fas fa-image"></i> 随机背景</h3>
         <!-- 手动一键随机按钮 -->
         <button class="random-btn" id="randomBgBtn">
-            <i class="fas fa-shuffle"></i>
+            <i class="fas fa-shuffle"></i> 切换背景
         </button>
         <!-- 自动切换开关 -->
         <div class="auto-switch">
@@ -296,23 +347,23 @@
         <main class="nav-categories">
             <!-- 动漫番剧分类 -->
             <div class="category-card">
-                <h2><i class="fas fa-tv"></i> 动漫番剧</h2>
+                <h2><i class="fas fa-tv"></i> 科技</h2>
                 <ul class="link-list">
-                    <li class="link-item"><a href="https://www.bilibili.com" target="_blank">哔哩哔哩</a></li>
-                    <li class="link-item"><a href="https://www.acfun.cn" target="_blank">AcFun</a></li>
-                    <li class="link-item"><a href="https://ani.gamer.com.tw" target="_blank">巴哈姆特动画疯</a></li>
-                    <li class="link-item"><a href="https://www.iqiyi.com" target="_blank">爱奇艺动漫</a></li>
+                    <li class="link-item"><a href="https://github.com" target="_blank">github</a></li>
+                    <li class="link-item"><a href="https://www.kali.org" target="_blank">kali Linux</a></li>
+                    <li class="link-item"><a href="https://www.deepseek.com" target="_blank">Deepseek</a></li>
+                    <li class="link-item"><a href="https://www.doubao.com" target="_blank">豆包</a></li>
                 </ul>
             </div>
 
             <!-- 漫画阅读分类 -->
             <div class="category-card">
-                <h2><i class="fas fa-book"></i> 漫画阅读</h2>
+                <h2><i class="fas fa-book"></i> 计算机课必备</h2>
                 <ul class="link-list">
-                    <li class="link-item"><a href="https://manga.bilibili.com" target="_blank">哔哩哔哩漫画</a></li>
-                    <li class="link-item"><a href="https://www.tencent动漫.com" target="_blank">腾讯动漫</a></li>
-                    <li class="link-item"><a href="https://ac.qq.com" target="_blank">快看漫画</a></li>
-                    <li class="link-item"><a href="https://www.dmzj.com" target="_blank">动漫之家</a></li>
+                    <li class="link-item"><a href="https://dzjszjz.nkxingxh.top" target="_blank">电子教室终结者</a></li>
+                    <li class="link-item"><a href="https://poki.com" target="_blank">poki</a></li>
+                    <li class="link-item"><a href="https://mcedge.github.io/" target="_blank">我的世界edge的个人介绍</a></li>
+                    <li class="link-item"><a href="https://vlink.cc/mcedge" target="_blank">我的世界edge的导航网站</a></li>
                 </ul>
             </div>
 
@@ -320,59 +371,57 @@
             <div class="category-card">
                 <h2><i class="fas fa-gamepad"></i> 游戏专区</h2>
                 <ul class="link-list">
-                    <li class="link-item"><a href="https://www.17173.com" target="_blank">17173游戏网</a></li>
+                    <li class="link-item"><a href="https://www.4399.com" target="_blank">4399小游戏</a></li>
                     <li class="link-item"><a href="https://www.taptap.com" target="_blank">TapTap</a></li>
-                    <li class="link-item"><a href="https://game.bilibili.com" target="_blank">哔哩哔哩游戏</a></li>
+                    <li class="link-item"><a href="s.team" target="_blank">steam</a></li>
                     <li class="link-item"><a href="https://www.steamchina.com" target="_blank">蒸汽平台</a></li>
                 </ul>
             </div>
 
-            <!-- 同人创作分类 -->
+            <!-- 新增下载资源分类 -->
             <div class="category-card">
-                <h2><i class="fas fa-pen-fancy"></i> 同人创作</h2>
-                <ul class="link-list">
-                    <li class="link-item"><a href="https://www.lofter.com" target="_blank">LOFTER</a></li>
-                    <li class="link-item"><a href="https://www.pixiv.net" target="_blank">Pixiv</a></li>
-                    <li class="link-item"><a href="https://www.bcy.net" target="_blank">半次元</a></li>
-                    <li class="link-item"><a href="https://cpwiki.org" target="_blank">CP百科</a></li>
+                <h2><i class="fas fa-download"></i> 资源下载</h2>
+                <ul class="link-list" id="downloadList">
+                    <li class="link-item">
+                        <button class="download-btn" data-file="pcl2启动器.zip" data-url="https://tianjiahe.lanzouv.com/iZiU93j5fk5i">
+                            <i class="fas fa-file-archive"></i>pcl2启动器<span class="file-size">龙腾猫跃</span>
+                        </button>
+                    </li>
+                    <li class="link-item">
+                        <button class="download-btn" data-file="0"data-url="0">
+                            <i class="fas fa-file-pdf"></i><span class="file-size"></span>
+                        </button>
+                    </li>
+                    <li class="link-item">
+                        <button class="download-btn" data-file="0" data-url="0">
+                            <i class="fas fa-file-image"></i> 0<span class="file-size"></span>
+                        </button>
+                    </li>
+                    <li class="link-item">
+                        <button class="download-btn" data-file="0" data-url="0">
+                            <i class="fas fa-file-exe"></i> 0<span class="file-size">(0MB)</span>
+                        </button>
+                    </li>
                 </ul>
-            </div>
-
-            <!-- 周边商城分类 -->
-            <div class="category-card">
-                <h2><i class="fas fa-shopping-cart"></i> 周边商城</h2>
-                <ul class="link-list">
-                    <li class="link-item"><a href="https://mall.bilibili.com" target="_blank">哔哩哔哩会员购</a></li>
-                    <li class="link-item"><a href="https://www.animate-onlineshop.cn" target="_blank">Animate</a></li>
-                    <li class="link-item"><a href="https://www.taobao.com" target="_blank">淘宝二次元专区</a></li>
-                    <li class="link-item"><a href="https://www.jd.com" target="_blank">京东动漫周边</a></li>
-                </ul>
-            </div>
-
-            <!-- 声优音乐分类 -->
-            <div class="category-card">
-                <h2><i class="fas fa-music"></i> 声优音乐</h2>
-                <ul class="link-list">
-                    <li class="link-item"><a href="https://music.163.com" target="_blank">网易云音乐</a></li>
-                    <li class="link-item"><a href="https://y.qq.com" target="_blank">QQ音乐</a></li>
-                    <li class="link-item"><a href="https://www.bilibili.com/audio" target="_blank">B站音频</a></li>
-                    <li class="link-item"><a href="https://www.missevan.com" target="_blank">猫耳FM</a></li>
-                </ul>
+                <!-- 批量下载按钮 -->
+                <div class="batch-download">
+                    <button class="batch-download-btn" id="batchDownloadBtn">
+                        <i class="fas fa-cloud-download-alt"></i> 批量下载全部资源
+                    </button>
+                </div>
             </div>
         </main>
 
         <!-- 网站底部 -->
         <footer>
-            <p>tianjiahe © 2026 | 用心打造专属导航体验</p>
+            <p>tjh.别点批量下载© 2026 | 用心打造专属导航体验</p>
         </footer>
     </div>
 
     <script>
         // 1. 定义二次元背景图片库（可自行添加/删除/替换链接）
         const bgImageList = [
-            'https://picsum.photos/id/1074/1920/1080',
             'https://hbzoss.yaash.cn/image/638164529b5fbea7@middle',
-            'https://picsum.photos/id/1062/1920/1080',
             'https://haowallpaper.com/link/common/file/previewFileImg/17882950812224896',
             'https://haowallpaper.com/link/common/file/previewFileImg/17187133610511744',
             'https://haowallpaper.com/link/common/file/previewFileImg/16811532760829312',
@@ -381,7 +430,7 @@
 
         const body = document.body;
         let autoSwitchTimer = null; // 自动切换定时器
-        const autoSwitchTime = 10000; // 自动切换间隔（10秒，可修改，单位ms）
+        const autoSwitchTime = 60000; // 自动切换间隔（60秒，可修改，单位ms）
 
         // 2. 随机设置背景方法
         function setRandomBg() {
@@ -396,6 +445,7 @@
         // 3. 页面加载时先设置一次随机背景
         window.onload = function() {
             setRandomBg();
+            initDownloadEvents(); // 初始化下载事件
         };
 
         // 4. 手动一键随机按钮点击事件
@@ -422,6 +472,119 @@
             autoSwitchTimer = setInterval(() => {
                 setRandomBg();
             }, autoSwitchTime);
+        }
+
+        // 7. 初始化下载功能事件
+        function initDownloadEvents() {
+            // 单个文件下载
+            const downloadButtons = document.querySelectorAll('.download-btn');
+            downloadButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const fileName = this.getAttribute('data-file');
+                    const fileUrl = this.getAttribute('data-url');
+                    downloadFile(fileUrl, fileName);
+                });
+            });
+
+            // 批量下载
+            document.getElementById('batchDownloadBtn').addEventListener('click', function() {
+                batchDownloadFiles();
+            });
+        }
+
+        // 8. 单个文件下载函数
+        function downloadFile(url, fileName) {
+            // 创建下载链接
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = fileName || 'download.file';
+            
+            // 添加动画效果
+            const btn = event.target.closest('.download-btn');
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> 正在下载...`;
+            
+            // 模拟下载延迟（实际使用时可移除）
+            setTimeout(() => {
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                // 恢复按钮状态
+                btn.innerHTML = `<i class="fas fa-check"></i> 下载完成`;
+                
+                // 3秒后恢复原始文本
+                setTimeout(() => {
+                    if (fileName.includes('.zip')) {
+                        btn.innerHTML = `<i class="fas fa-file-archive"></i> ${fileName} <span class="file-size">(${btn.querySelector('.file-size').textContent})</span>`;
+                    } else if (fileName.includes('.pdf')) {
+                        btn.innerHTML = `<i class="fas fa-file-pdf"></i> ${fileName} <span class="file-size">(${btn.querySelector('.file-size').textContent})</span>`;
+                    } else if (fileName.includes('.exe')) {
+                        btn.innerHTML = `<i class="fas fa-file-exe"></i> ${fileName} <span class="file-size">(${btn.querySelector('.file-size').textContent})</span>`;
+                    } else {
+                        btn.innerHTML = `<i class="fas fa-file-image"></i> ${fileName} <span class="file-size">(${btn.querySelector('.file-size').textContent})</span>`;
+                    }
+                }, 3000);
+                
+                // 提示下载开始
+                alert(`开始下载：${fileName}`);
+            }, 1000);
+        }
+
+        // 9. 批量下载函数
+        function batchDownloadFiles() {
+            const downloadButtons = document.querySelectorAll('.download-btn');
+            const batchBtn = document.getElementById('batchDownloadBtn');
+            
+            // 修改按钮状态
+            batchBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> 批量下载中...`;
+            batchBtn.disabled = true;
+            
+            // 逐个下载文件（间隔1秒）
+            let index = 0;
+            const interval = setInterval(() => {
+                if (index < downloadButtons.length) {
+                    const btn = downloadButtons[index];
+                    const fileName = btn.getAttribute('data-file');
+                    const fileUrl = btn.getAttribute('data-url');
+                    
+                    // 触发下载
+                    const link = document.createElement('a');
+                    link.href = fileUrl;
+                    link.download = fileName;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    // 更新按钮状态
+                    btn.innerHTML = `<i class="fas fa-check"></i> 已下载`;
+                    
+                    index++;
+                } else {
+                    clearInterval(interval);
+                    // 恢复批量按钮状态
+                    batchBtn.innerHTML = `<i class="fas fa-cloud-download-alt"></i> 批量下载全部资源`;
+                    batchBtn.disabled = false;
+                    
+                    // 提示批量下载完成
+                    alert(`批量下载完成！共下载 ${downloadButtons.length} 个文件`);
+                    
+                    // 恢复所有下载按钮状态
+                    setTimeout(() => {
+                        downloadButtons.forEach(btn => {
+                            const fileName = btn.getAttribute('data-file');
+                            if (fileName.includes('.zip')) {
+                                btn.innerHTML = `<i class="fas fa-file-archive"></i> ${fileName} <span class="file-size">(${btn.querySelector('.file-size').textContent})</span>`;
+                            } else if (fileName.includes('.pdf')) {
+                                btn.innerHTML = `<i class="fas fa-file-pdf"></i> ${fileName} <span class="file-size">(${btn.querySelector('.file-size').textContent})</span>`;
+                            } else if (fileName.includes('.exe')) {
+                                btn.innerHTML = `<i class="fas fa-file-exe"></i> ${fileName} <span class="file-size">(${btn.querySelector('.file-size').textContent})</span>`;
+                            } else {
+                                btn.innerHTML = `<i class="fas fa-file-image"></i> ${fileName} <span class="file-size">(${btn.querySelector('.file-size').textContent})</span>`;
+                            }
+                        });
+                    }, 5000);
+                }
+            }, 1000);
         }
     </script>
 </body>
