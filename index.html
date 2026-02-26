@@ -230,56 +230,18 @@
             transform: translateX(5px);
         }
 
-        /* 下载按钮样式 */
-        .download-btn {
-            display: inline-block;
-            color: #ffffff;
-            text-decoration: none;
-            padding: 8px 12px;
-            border-radius: 8px;
-            transition: all 0.2s ease;
+        /* 下载入口特殊样式 */
+        .download-entrance a {
             background: rgba(66, 153, 225, 0.2);
             border: 1px solid #4299e1;
-            cursor: pointer;
-            width: 100%;
             text-align: center;
+            font-weight: 500;
         }
 
-        .download-btn:hover {
+        .download-entrance a:hover {
             background: rgba(66, 153, 225, 0.4);
             color: #e3f2fd;
-            transform: translateX(5px);
             box-shadow: 0 0 10px rgba(66, 153, 225, 0.5);
-        }
-
-        /* 批量下载按钮 */
-        .batch-download {
-            margin-top: 15px;
-            text-align: center;
-        }
-
-        .batch-download-btn {
-            padding: 10px 20px;
-            border-radius: 8px;
-            border: 1px solid #4299e1;
-            background: rgba(66, 153, 225, 0.3);
-            color: #fff;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.9rem;
-        }
-
-        .batch-download-btn:hover {
-            background: rgba(66, 153, 225, 0.5);
-            box-shadow: 0 0 10px rgba(66, 153, 225, 0.5);
-            transform: scale(1.05);
-        }
-
-        /* 下载资源大小提示 */
-        .file-size {
-            font-size: 0.75rem;
-            color: #999;
-            margin-left: 5px;
         }
 
         /* 底部样式 - 透明化 */
@@ -409,35 +371,16 @@
                 </ul>
             </div>
 
+            <!-- 新增资源下载入口 -->
             <div class="category-card">
                 <h2><i class="fas fa-download"></i> 资源下载</h2>
-                <ul class="link-list" id="downloadList">
-                    <li class="link-item">
-                        <button class="download-btn" data-file="pcl2启动器.zip" data-url="https://tianjiahe.lanzouv.com/iZiU93j5fk5i">
-                            <i class="fas fa-file-archive"></i>pcl2启动器<span class="file-size">龙腾猫跃</span>
-                        </button>
-                    </li>
-                    <li class="link-item">
-                        <button class="download-btn" data-file="0"data-url="0">
-                            <i class="fas fa-file-pdf"></i><span class="file-size"></span>
-                        </button>
-                    </li>
-                    <li class="link-item">
-                        <button class="download-btn" data-file="0" data-url="0">
-                            <i class="fas fa-file-image"></i> 0<span class="file-size"></span>
-                        </button>
-                    </li>
-                    <li class="link-item">
-                        <button class="download-btn" data-file="0" data-url="0">
-                            <i class="fas fa-file-exe"></i> 0<span class="file-size">(0MB)</span>
-                        </button>
+                <ul class="link-list">
+                    <li class="link-item download-entrance">
+                        <a href="download.html" target="_blank">
+                            <i class="fas fa-cloud-download-alt"></i> 进入资源下载中心
+                        </a>
                     </li>
                 </ul>
-                <div class="batch-download">
-                    <button class="batch-download-btn" id="batchDownloadBtn">
-                        <i class="fas fa-cloud-download-alt"></i> 批量下载全部资源
-                    </button>
-                </div>
             </div>
         </main>
 
@@ -469,7 +412,6 @@
 
         window.onload = function() {
             setRandomBg();
-            initDownloadEvents();
             
             // 生成房间ID并拼接到跳转链接（保证跳转后进入同一房间）
             const roomId = localStorage.getItem('chat_room_id') || `room_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
@@ -497,102 +439,6 @@
             autoSwitchTimer = setInterval(() => {
                 setRandomBg();
             }, autoSwitchTime);
-        }
-
-        // 2. 下载功能相关逻辑
-        function initDownloadEvents() {
-            const downloadButtons = document.querySelectorAll('.download-btn');
-            downloadButtons.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const fileName = this.getAttribute('data-file');
-                    const fileUrl = this.getAttribute('data-url');
-                    downloadFile(fileUrl, fileName);
-                });
-            });
-
-            document.getElementById('batchDownloadBtn').addEventListener('click', function() {
-                batchDownloadFiles();
-            });
-        }
-
-        function downloadFile(url, fileName) {
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = fileName || 'download.file';
-            
-            const btn = event.target.closest('.download-btn');
-            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> 正在下载...`;
-            
-            setTimeout(() => {
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                
-                btn.innerHTML = `<i class="fas fa-check"></i> 下载完成`;
-                
-                setTimeout(() => {
-                    if (fileName.includes('.zip')) {
-                        btn.innerHTML = `<i class="fas fa-file-archive"></i> ${fileName} <span class="file-size">(${btn.querySelector('.file-size').textContent})</span>`;
-                    } else if (fileName.includes('.pdf')) {
-                        btn.innerHTML = `<i class="fas fa-file-pdf"></i> ${fileName} <span class="file-size">(${btn.querySelector('.file-size').textContent})</span>`;
-                    } else if (fileName.includes('.exe')) {
-                        btn.innerHTML = `<i class="fas fa-file-exe"></i> ${fileName} <span class="file-size">(${btn.querySelector('.file-size').textContent})</span>`;
-                    } else {
-                        btn.innerHTML = `<i class="fas fa-file-image"></i> ${fileName} <span class="file-size">(${btn.querySelector('.file-size').textContent})</span>`;
-                    }
-                }, 3000);
-                
-                alert(`开始下载：${fileName}`);
-            }, 1000);
-        }
-
-        function batchDownloadFiles() {
-            const downloadButtons = document.querySelectorAll('.download-btn');
-            const batchBtn = document.getElementById('batchDownloadBtn');
-            
-            batchBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> 批量下载中...`;
-            batchBtn.disabled = true;
-            
-            let index = 0;
-            const interval = setInterval(() => {
-                if (index < downloadButtons.length) {
-                    const btn = downloadButtons[index];
-                    const fileName = btn.getAttribute('data-file');
-                    const fileUrl = btn.getAttribute('data-url');
-                    
-                    const link = document.createElement('a');
-                    link.href = fileUrl;
-                    link.download = fileName;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    
-                    btn.innerHTML = `<i class="fas fa-check"></i> 已下载`;
-                    
-                    index++;
-                } else {
-                    clearInterval(interval);
-                    batchBtn.innerHTML = `<i class="fas fa-cloud-download-alt"></i> 批量下载全部资源`;
-                    batchBtn.disabled = false;
-                    
-                    alert(`批量下载完成！共下载 ${downloadButtons.length} 个文件`);
-                    
-                    setTimeout(() => {
-                        downloadButtons.forEach(btn => {
-                            const fileName = btn.getAttribute('data-file');
-                            if (fileName.includes('.zip')) {
-                                btn.innerHTML = `<i class="fas fa-file-archive"></i> ${fileName} <span class="file-size">(${btn.querySelector('.file-size').textContent})</span>`;
-                            } else if (fileName.includes('.pdf')) {
-                                btn.innerHTML = `<i class="fas fa-file-pdf"></i> ${fileName} <span class="file-size">(${btn.querySelector('.file-size').textContent})</span>`;
-                            } else if (fileName.includes('.exe')) {
-                                btn.innerHTML = `<i class="fas fa-file-exe"></i> ${fileName} <span class="file-size">(${btn.querySelector('.file-size').textContent})</span>`;
-                            } else {
-                                btn.innerHTML = `<i class="fas fa-file-image"></i> ${fileName} <span class="file-size">(${btn.querySelector('.file-size').textContent})</span>`;
-                            }
-                        });
-                    }, 5000);
-                }
-            }, 1000);
         }
     </script>
 </body>
