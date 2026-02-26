@@ -1,1 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1对1在线聊天 | from:tianjiahe</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+        }
+        body {
+            color: #fff;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #2c3e50 0%, #4a148c 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .chat-container {
+            width: 100%;
+            max-width: 450px;
+            height: 80vh;
+            max-height: 650px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 30px rgba(255, 105, 180, 0.3);
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chat-header h2 {
+            color: #ff9ecc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.4rem;
+        }
+        .online-status {
+            font-size: 0.9rem;
+            color: #4ade80;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-left: 10px;
+        }
+        .offline-status {
+            color: #f87171;
+        }
+        .back-btn {
+            background: rgba(255, 105, 180, 0.3);
+            border: 1px solid #ff69b4;
+            color: #fff;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+        }
+        .back-btn:hover {
+            background: rgba(255, 105, 180, 0.5);
+            box-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+        }
+        .chat-room-area {
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .chat-room-area p {
+            font-size: 0.9rem;
+            color: #e0e0e0;
+            margin-bottom: 10px;
+        }
+        .room-link-box {
+            display: flex;
+            gap: 10px;
+        }
+        .room-link-input {
+            flex: 1;
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 0.9rem;
+            outline: none;
+        }
+        .room-link-input:focus {
+            border-color: #ff69b4;
+            box-shadow: 0 0 10px rgba(255, 105, 180, 0.2);
+        }
+        .copy-link-btn {
+            padding: 0 15px;
+            background: rgba(255, 105, 180, 0.3);
+            border: 1px solid #ff69b4;
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+        .copy-link-btn:hover {
+            background: rgba(255, 105, 180, 0.5);
+        }
+        .chat-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .chat-content::-webkit-scrollbar {
+            width: 8px;
+        }
+        .chat-content::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+        .chat-content::-webkit-scrollbar-thumb {
+            background: rgba(255, 105, 180, 0.5);
+            border-radius: 4px;
+        }
+        .message {
+            max-width: 80%;
+            padding: 12px 18px;
+            border-radius: 20px;
+            line-height: 1.5;
+            font-size: 0.95rem;
+            position: relative;
+        }
+        .message.self {
+            background: rgba(255, 105, 180, 0.3);
+            align-self: flex-end;
+            border-bottom-right-radius: 6px;
+        }
+        .message.other {
+            background: rgba(255, 255, 255, 0.1);
+            align-self: flex-start;
+            border-bottom-left-radius: 6px;
+        }
+        .message.system {
+            background: rgba(66, 153, 225, 0.2);
+            align-self: center;
+            font-size: 0.85rem;
+            padding: 8px 15px;
+            border-radius: 15px;
+            color: #e0e0e0;
+        }
+        .message-time {
+            font-size: 0.75rem;
+            color: #999;
+            margin-top: 5px;
+            text-align: right;
+        }
+        .message.other .message-time {
+            text-align: left;
+        }
+        .message.system .message-time {
+            display: none;
+        }
+        .chat-input-area {
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 12px;
+        }
+        .chat-input {
+            flex: 1;
+            padding: 12px 18px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            color: #fff;
+            outline: none;
+            font-size: 0.95rem;
+        }
+        .chat-input:focus {
+            border-color: #ff69b4;
+            box-shadow: 0 0 10px rgba(255, 105, 180, 0.2);
+        }
+        .chat-send-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #ff69b4;
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .chat-send-btn:hover {
+            background: #ff4d94;
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+        }
+        @media (max-width: 768px) {
+            .chat-container {
+                height: 90vh;
+                max-height: none;
+            }
+            .chat-header h2 {
+                font-size: 1.2rem;
+            }
+            .message {
+                font-size: 0.9rem;
+                padding: 10px 15px;
+            }
+        }
+    </style>
+    <!-- 替换为更稳定的图标库 CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <div style="display: flex; align-items: center;">
+                <h2><i class="fas fa-comments"></i> 1对1在线聊天</h2>
+                <span class="online-status" id="onlineStatus">
+                    <i class="fas fa-circle"></i> 等待对方加入
+                </span>
+            </div>
+            <!-- 核心修改：适配 GitHub Pages 返回路径 -->
+            <a href="./index.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i> 返回首页
+            </a>
+        </div>
 
+        <div class="chat-room-area">
+            <p>专属聊天房间（复制链接发给好友即可1对1聊天）：</p>
+            <div class="room-link-box">
+                <input type="text" class="room-link-input" id="roomLinkInput" readonly>
+                <button class="copy-link-btn" id="copyLinkBtn">
+                    <i class="fas fa-copy"></i> 复制
+                </button>
+            </div>
+        </div>
+
+        <div class="chat-content" id="chatContent">
+            <div class="message system">
+                👋 欢迎使用1对1在线聊天！复制上方链接发给好友即可开始聊天
+            </div>
+        </div>
+
+        <div class="chat-input-area">
+            <input type="text" class="chat-input" id="chatInput" placeholder="请输入消息...">
+            <button class="chat-send-btn" id="chatSendBtn">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 核心优化：解决 GitHub Pages 下 WebSocket 跨域问题
+        let ws = null;
+        const chatContent = document.getElementById('chatContent');
+        const chatInput = document.getElementById('chatInput');
+        const chatSendBtn = document.getElementById('chatSendBtn');
+        const roomLinkInput = document.getElementById('roomLinkInput');
+        const copyLinkBtn = document.getElementById('copyLinkBtn');
+        const onlineStatus = document.getElementById('onlineStatus');
+        
+        // 从URL获取房间ID
+        const urlParams = new URLSearchParams(window.location.search);
+        let roomId = urlParams.get('room') || localStorage.getItem('chat_room_id');
+        if (!roomId) {
+            roomId = `room_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
+            localStorage.setItem('chat_room_id', roomId);
+        }
+        const userId = `user_${Math.floor(Math.random() * 1000000)}`;
+        
+        // 核心修改：生成适配 GitHub Pages 的完整链接
+        const currentUrl = window.location.href.split('?')[0];
+        const roomLink = `${currentUrl}?room=${roomId}`;
+        roomLinkInput.value = roomLink;
+
+        window.onload = function() {
+            // 优先使用兼容 HTTPS 的 WebSocket 服务器
+            connectWebSocket();
+            initEventListeners();
+        };
+
+        // 初始化事件监听
+        function initEventListeners() {
+            // 核心优化：替换复制链接方法（兼容现代浏览器/GitHub Pages 安全策略）
+            copyLinkBtn.addEventListener('click', async () => {
+                try {
+                    await navigator.clipboard.writeText(roomLinkInput.value);
+                    copyLinkBtn.innerHTML = '<i class="fas fa-check"></i> 已复制';
+                    setTimeout(() => {
+                        copyLinkBtn.innerHTML = '<i class="fas fa-copy"></i> 复制';
+                    }, 2000);
+                } catch (err) {
+                    // 降级方案
+                    roomLinkInput.select();
+                    document.execCommand('copy');
+                    copyLinkBtn.innerHTML = '<i class="fas fa-check"></i> 已复制';
+                    setTimeout(() => {
+                        copyLinkBtn.innerHTML = '<i class="fas fa-copy"></i> 复制';
+                    }, 2000);
+                }
+            });
+
+            chatSendBtn.addEventListener('click', sendMessage);
+            chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+        }
+
+        // 核心优化：使用兼容 HTTPS 的 WebSocket 服务器
+        function connectWebSocket() {
+            if (ws) {
+                ws.close();
+            }
+
+            // 替换为更稳定的公共 WebSocket 测试服务器（支持 HTTPS）
+            const wsUrl = 'wss://ws.postman-echo.com/raw'; 
+            ws = new WebSocket(wsUrl);
+
+            ws.onopen = () => {
+                console.log('WebSocket连接成功');
+                updateOnlineStatus(true);
+                sendSystemMessage(`✅ 已加入房间：${roomId}`);
+                
+                ws.send(JSON.stringify({
+                    type: 'join',
+                    roomId: roomId,
+                    userId: userId
+                }));
+            };
+
+            ws.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    if (data.roomId === roomId && data.userId !== userId) {
+                        addMessageToChat(data.content, 'other');
+                    }
+                } catch (e) {
+                    console.log('非结构化消息:', event.data);
+                }
+            };
+
+            ws.onclose = () => {
+                console.log('WebSocket连接关闭');
+                updateOnlineStatus(false);
+                sendSystemMessage('⚠️ 聊天连接已断开，正在尝试重连...');
+                
+                setTimeout(() => {
+                    connectWebSocket();
+                }, 3000);
+            };
+
+            ws.onerror = (error) => {
+                console.error('WebSocket错误:', error);
+                updateOnlineStatus(false);
+                sendSystemMessage('❌ 聊天连接出错（GitHub Pages 仅支持HTTPS WebSocket）');
+            };
+        }
+
+        function sendMessage() {
+            const message = chatInput.value.trim();
+            if (!message) return;
+            
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                sendSystemMessage('⚠️ 未连接到聊天服务器，无法发送消息');
+                return;
+            }
+
+            addMessageToChat(message, 'self');
+            
+            ws.send(JSON.stringify({
+                type: 'message',
+                roomId: roomId,
+                userId: userId,
+                content: message,
+                time: getCurrentTime()
+            }));
+            
+            chatInput.value = '';
+        }
+
+        function addMessageToChat(content, type) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            
+            const time = getCurrentTime();
+            messageDiv.innerHTML = `
+                ${content}
+                <div class="message-time">${time}</div>
+            `;
+            
+            chatContent.appendChild(messageDiv);
+            chatContent.scrollTop = chatContent.scrollHeight;
+        }
+
+        function sendSystemMessage(content) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message system';
+            messageDiv.textContent = content;
+            
+            chatContent.appendChild(messageDiv);
+            chatContent.scrollTop = chatContent.scrollHeight;
+        }
+
+        function updateOnlineStatus(isOnline) {
+            if (isOnline) {
+                onlineStatus.className = 'online-status';
+                onlineStatus.innerHTML = '<i class="fas fa-circle"></i> 在线';
+            } else {
+                onlineStatus.className = 'online-status offline-status';
+                onlineStatus.innerHTML = '<i class="fas fa-circle"></i> 离线';
+            }
+        }
+
+        function getCurrentTime() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+            return `${hours}:${minutes}:${seconds}`;
+        }
+    </script>
+</body>
+</html>
