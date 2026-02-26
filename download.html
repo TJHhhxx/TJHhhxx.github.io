@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>资源下载中心 | from:tianjiahe</title>
+    <style>
+        /* 全局样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+        }
+
+        /* 页面背景（与导航页保持一致） */
+        body {
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+            background-color: #2c3e50;
+            background: linear-gradient(135deg, #2c3e50 0%, #4a148c 100%);
+            transition: background 0.8s ease-in-out;
+            background-blend-mode: overlay;
+        }
+
+        /* 背景控制面板（保留随机背景功能） */
+        .bg-control-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 12px;
+            padding: 15px;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .bg-control-panel h3 {
+            color: #ff9ecc;
+            font-size: 1rem;
+            margin-bottom: 12px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .bg-control-panel h3 i {
+            font-size: 0.9em;
+        }
+
+        .random-btn {
+            width: 100%;
+            padding: 8px 0;
+            border-radius: 8px;
+            border: 1px solid #ff69b4;
+            background: rgba(255, 105, 180, 0.2);
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        .random-btn:hover {
+            background: rgba(255, 105, 180, 0.4);
+            box-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+            transform: scale(1.02);
+        }
+
+        /* 头部导航 */
+        .header-nav {
+            max-width: 1200px;
+            margin: 0 auto 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 16px;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header-nav h1 {
+            color: #ff69b4;
+            text-shadow: 0 0 10px #ff69b4;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .back-home-btn {
+            background: rgba(255, 105, 180, 0.3);
+            border: 1px solid #ff69b4;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+        }
+
+        .back-home-btn:hover {
+            background: rgba(255, 105, 180, 0.5);
+            box-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+        }
+
+        /* 下载主容器 */
+        .download-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 0 30px rgba(255, 105, 180, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        /* 下载分类 */
+        .download-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        /* 分类卡片 */
+        .category-card {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            border-color: #ff69b4;
+            box-shadow: 0 8px 15px rgba(255, 105, 180, 0.2);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .category-card h2 {
+            color: #ff9ecc;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* 文件列表 */
+        .file-list {
+            list-style: none;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .file-item {
+            margin-bottom: 8px;
+        }
+
+        /* 下载按钮样式 */
+        .download-btn {
+            display: block;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 12px 15px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            background: rgba(66, 153, 225, 0.2);
+            border: 1px solid #4299e1;
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+            font-size: 0.95rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .download-btn:hover {
+            background: rgba(66, 153, 225, 0.4);
+            color: #e3f2fd;
+            transform: translateX(5px);
+            box-shadow: 0 0 10px rgba(66, 153, 225, 0.5);
+        }
+
+        .download-btn .file-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .download-btn .file-size {
+            font-size: 0.75rem;
+            color: #999;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        /* 批量下载区域 */
+        .batch-download {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .batch-download-btn {
+            padding: 12px 30px;
+            border-radius: 8px;
+            border: 1px solid #ff69b4;
+            background: rgba(255, 105, 180, 0.3);
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 0 auto;
+        }
+
+        .batch-download-btn:hover {
+            background: rgba(255, 105, 180, 0.5);
+            box-shadow: 0 0 15px rgba(255, 105, 180, 0.5);
+            transform: scale(1.05);
+        }
+
+        /* 下载进度提示 */
+        .download-progress {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 8px;
+            padding: 15px 20px;
+            color: #fff;
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+        }
+
+        .download-progress.show {
+            display: flex;
+        }
+
+        .progress-bar {
+            width: 200px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #ff69b4;
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* 底部信息 */
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        /* 响应式适配 */
+        @media (max-width: 768px) {
+            .bg-control-panel {
+                position: static;
+                margin: 0 auto 20px;
+                max-width: 300px;
+            }
+
+            .download-container {
+                padding: 20px;
+            }
+
+            .download-categories {
+                grid-template-columns: 1fr;
+            }
+
+            .header-nav h1 {
+                font-size: 1.5rem;
+            }
+
+            .batch-download-btn {
+                width: 100%;
+            }
+
+            .download-progress {
+                width: 90%;
+            }
+        }
+    </style>
+    <!-- 引入图标库 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- 背景控制面板 -->
+    <div class="bg-control-panel">
+        <h3><i class="fas fa-image"></i> 随机背景</h3>
+        <button class="random-btn" id="randomBgBtn">
+            <i class="fas fa-shuffle"></i> 切换背景
+        </button>
+    </div>
+
+    <!-- 头部导航 -->
+    <div class="header-nav">
+        <h1><i class="fas fa-download"></i> 资源下载中心</h1>
+        <a href="./index.html" class="back-home-btn">
+            <i class="fas fa-home"></i> 返回首页
+        </a>
+    </div>
+
+    <!-- 下载主容器 -->
+    <div class="download-container">
+        <!-- 下载分类 -->
+        <div class="download-categories">
+            <!-- 游戏资源分类 -->
+            <div class="category-card">
+                <h2><i class="fas fa-gamepad"></i> 游戏资源</h2>
+                <ul class="file-list">
+                    <li class="file-item">
+                        <button class="download-btn" data-file="PCL2启动器.zip" data-url="https://tianjiahe.lanzouv.com/iZiU93j5fk5i" data-size="8.5MB">
+                            <div class="file-info">
+                                <i class="fas fa-file-archive"></i>
+                                <span>PCL2启动器（龙腾猫跃）</span>
+                            </div>
+                            <span class="file-size">8.5MB</span>
+                        </button>
+                    </li>
+                    <li class="file-item">
+                        <button class="download-btn" data-file="消失的月亮整合包.zip" data-url="https://tianjiahe.lanzouv.com/i07rJ3j8pnaj" data-size="80.5MB">
+                            <div class="file-info">
+                                <i class="fas fa-file-archive"></i>
+                                <span>无密码</span>
+                            </div>
+                            <span class="file-size">80.5MB</span>
+                        </button>
+                    </li>
+                    <li class="file-item">
+                        <button class="download-btn" data-file="0" data-url="https://example.、/shaders.zip" data-size="0MB">
+                            <div class="file-info">
+                                <i class="fas fa-file-archive"></i>
+                                <span>000</span>
+                            </div>
+                            <span class="file-size">0MB</span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 软件工具分类 -->
+            <div class="category-card">
+                <h2><i class="fas fa-tools"></i> 软件工具</h2>
+                <ul class="file-list">
+                    <li class="file-item">
+                        <button class="download-btn" data-file="电子教室终结者.exe" data-url="https://dzjszjz.nkxingxh.top" data-size="2.1MB">
+                            <div class="file-info">
+                                <i class="fas fa-file-exe"></i>
+                                <span>电子教室终结者</span>
+                            </div>
+                            <span class="file-size">2.1MB</span>
+                        </button>
+                    </li>
+                    <li class="file-item">
+                        <button class="download-btn" data-file="ResourceHacker" data-url="https://tianjiahe.lanzouv.com/b0139jxh6f" data-size="?MB">
+                            <div class="file-info">
+                                <i class="fas fa-file-exe"></i>
+                                <span>密码均为111</span>
+                            </div>
+                            <span class="file-size">？MB</span>
+                        </button>
+                    </li>
+                    <li class="file-item">
+                        <button class="download-btn" data-file="VSCode_Setup.exe" data-url="https://example.com/vscode.exe" data-size="85MB">
+                            <div class="file-info">
+                                <i class="fas fa-file-exe"></i>
+                                <span>VSCode 最新版</span>
+                            </div>
+                            <span class="file-size">85MB</span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 学习资料分类 -->
+            <div class="category-card">
+                <h2><i class="fas fa-book"></i> 学习资料</h2>
+                <ul class="file-list">
+                    <li class="file-item">
+                        <button class="download-btn" data-file="Python入门教程.pdf" data-url="https://example.com/python.pdf" data-size="12MB">
+                            <div class="file-info">
+                                <i class="fas fa-file-pdf"></i>
+                                <span>Python入门教程（完整版）</span>
+                            </div>
+                            <span class="file-size">12MB</span>
+                        </button>
+                    </li>
+                    <li class="file-item">
+                        <button class="download-btn" data-file="Linux命令速查表.pdf" data-url="https://example.com/linux.pdf" data-size="3.5MB">
+                            <div class="file-info">
+                                <i class="fas fa-file-pdf"></i>
+                                <span>Linux命令速查表</span>
+                            </div>
+                            <span class="file-size">3.5MB</span>
+                        </button>
+                    </li>
+                    <li class="file-item">
+                        <button class="download-btn" data-file="HTML+CSS教程.zip" data-url="https://example.com/htmlcss.zip" data-size="28MB">
+                            <div class="file-info">
+                                <i class="fas fa-file-archive"></i>
+                                <span>HTML+CSS零基础教程</span>
+                            </div>
+                            <span class="file-size">28MB</span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 壁纸素材分类 -->
+            <div class="category-card">
+                <h2><i class="fas fa-image"></i> 壁纸素材</h2>
+                <ul class="file-list">
+                    <li class="file-item">
+                        <button class="download-btn" data-file="4K壁纸合集.zip" data-url="https://example.com/4kwallpaper.zip" data-size="1.2GB">
+                            <div class="file-info">
+                                <i class="fas fa-file-archive"></i>
+                                <span>4K超清壁纸合集</span>
+                            </div>
+                            <span class="file-size">1.2GB</span>
+                        </button>
+                    </li>
+                    <li class="file-item">
+                        <button class="download-btn" data-file="动漫壁纸包.zip" data-url="https://example.com/anime.zip" data-size="850MB">
+                            <div class="file-info">
+                                <i class="fas fa-file-archive"></i>
+                                <span>动漫壁纸精选包</span>
+                            </div>
+                            <span class="file-size">850MB</span>
+                        </button>
+                    </li>
+                    <li class="file-item">
+                        <button class="download-btn" data-file="极简壁纸.zip" data-url="https://example.com/simple.zip" data-size="250MB">
+                            <div class="file-info">
+                                <i class="fas fa-file-archive"></i>
+                                <span>极简风格壁纸</span>
+                            </div>
+                            <span class="file-size">250MB</span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 批量下载按钮 -->
+        <div class="batch-download">
+            <button class="batch-download-btn" id="batchDownloadBtn">
+                <i class="fas fa-cloud-download-alt"></i> 批量下载全部资源
+            </button>
+        </div>
+
+        <!-- 下载进度提示 -->
+        <div class="download-progress" id="downloadProgress">
+            <i class="fas fa-spinner fa-spin"></i>
+            <span id="progressText">正在下载：PCL2启动器.zip</span>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <span id="progressPercent">0%</span>
+        </div>
+
+        <!-- 底部信息 -->
+        <footer>
+            <p>tjh.资源下载中心 © 2026 | 所有资源仅用于学习交流，请勿商用</p>
+        </footer>
+    </div>
+
+    <script>
+        // ========== 1. 背景切换功能 ==========
+        const bgImageList = [
+            'https://hbzoss.yaash.cn/image/638164529b5fbea7@middle',
+            'https://haowallpaper.com/link/common/file/previewFileImg/17882950812224896',
+            'https://haowallpaper.com/link/common/file/previewFileImg/17187133610511744',
+            'https://haowallpaper.com/link/common/file/previewFileImg/16811532760829312',
+            'https://haowallpaper.com/link/common/file/previewFileImg/15680526683050304'
+        ];
+
+        const body = document.body;
+
+        // 设置随机背景
+        function setRandomBg() {
+            const randomIndex = Math.floor(Math.random() * bgImageList.length);
+            const randomBgUrl = bgImageList[randomIndex];
+            body.style.background = `url('${randomBgUrl}') center/cover no-repeat fixed, 
+                                     linear-gradient(135deg, #2c3e50 0%, #4a148c 100%)`;
+        }
+
+        // 页面加载时设置背景
+        window.onload = function() {
+            setRandomBg();
+            initDownloadEvents();
+        };
+
+        // 切换背景按钮事件
+        document.getElementById('randomBgBtn').addEventListener('click', setRandomBg);
+
+        // ========== 2. 下载功能核心逻辑 ==========
+        const downloadProgress = document.getElementById('downloadProgress');
+        const progressText = document.getElementById('progressText');
+        const progressFill = document.getElementById('progressFill');
+        const progressPercent = document.getElementById('progressPercent');
+
+        // 初始化下载事件
+        function initDownloadEvents() {
+            // 单个文件下载
+            const downloadButtons = document.querySelectorAll('.download-btn');
+            downloadButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const fileName = this.getAttribute('data-file');
+                    const fileUrl = this.getAttribute('data-url');
+                    const fileSize = this.getAttribute('data-size');
+                    downloadSingleFile(fileUrl, fileName, fileSize, this);
+                });
+            });
+
+            // 批量下载
+            document.getElementById('batchDownloadBtn').addEventListener('click', batchDownloadAllFiles);
+        }
+
+        // 单个文件下载（带进度提示）
+        function downloadSingleFile(url, fileName, fileSize, btnElement) {
+            // 显示进度条
+            downloadProgress.classList.add('show');
+            progressText.textContent = `正在下载：${fileName}`;
+            progressFill.style.width = '0%';
+            progressPercent.textContent = '0%';
+
+            // 模拟下载进度（实际项目中可替换为真实进度监听）
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += Math.floor(Math.random() * 10) + 5;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(progressInterval);
+                }
+                progressFill.style.width = `${progress}%`;
+                progressPercent.textContent = `${progress}%`;
+
+                // 下载完成
+                if (progress === 100) {
+                    setTimeout(() => {
+                        // 创建下载链接
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = fileName;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+
+                        // 更新按钮状态
+                        btnElement.innerHTML = `
+                            <div class="file-info">
+                                <i class="fas fa-check"></i>
+                                <span>${fileName.split('.')[0]}（已下载）</span>
+                            </div>
+                            <span class="file-size">${fileSize}</span>
+                        `;
+                        btnElement.style.background = 'rgba(72, 187, 120, 0.2)';
+                        btnElement.style.borderColor = '#48bb78';
+
+                        // 隐藏进度条
+                        setTimeout(() => {
+                            downloadProgress.classList.remove('show');
+                            // 3秒后恢复按钮样式
+                            setTimeout(() => {
+                                btnElement.innerHTML = `
+                                    <div class="file-info">
+                                        <i class="fas fa-file-${getFileIconType(fileName)}"></i>
+                                        <span>${fileName.split('.')[0]}${fileName.includes('.zip') ? '（龙腾猫跃）' : ''}</span>
+                                    </div>
+                                    <span class="file-size">${fileSize}</span>
+                                `;
+                                btnElement.style.background = 'rgba(66, 153, 225, 0.2)';
+                                btnElement.style.borderColor = '#4299e1';
+                            }, 3000);
+                        }, 1000);
+
+                        // 提示下载完成
+                        alert(`✅ ${fileName} 下载完成！`);
+                    }, 500);
+                }
+            }, 200);
+        }
+
+        // 批量下载所有文件
+        function batchDownloadAllFiles() {
+            const downloadButtons = document.querySelectorAll('.download-btn');
+            const batchBtn = document.getElementById('batchDownloadBtn');
+            
+            // 禁用批量按钮
+            batchBtn.disabled = true;
+            batchBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> 批量下载中...`;
+
+            // 显示进度条
+            downloadProgress.classList.add('show');
+            let currentFileIndex = 0;
+            let totalFiles = downloadButtons.length;
+
+            // 递归下载文件
+            function downloadNextFile() {
+                if (currentFileIndex >= totalFiles) {
+                    // 所有文件下载完成
+                    progressText.textContent = '批量下载完成！';
+                    progressFill.style.width = '100%';
+                    progressPercent.textContent = '100%';
+                    
+                    setTimeout(() => {
+                        downloadProgress.classList.remove('show');
+                        batchBtn.innerHTML = `<i class="fas fa-cloud-download-alt"></i> 批量下载全部资源`;
+                        batchBtn.disabled = false;
+                        alert(`🎉 批量下载完成！共下载 ${totalFiles} 个文件`);
+                    }, 1000);
+                    return;
+                }
+
+                // 获取当前文件信息
+                const btn = downloadButtons[currentFileIndex];
+                const fileName = btn.getAttribute('data-file');
+                const fileUrl = btn.getAttribute('data-url');
+                const fileSize = btn.getAttribute('data-size');
+
+                // 更新进度提示
+                progressText.textContent = `正在下载(${currentFileIndex+1}/${totalFiles})：${fileName}`;
+                progressFill.style.width = `${(currentFileIndex / totalFiles) * 100}%`;
+                progressPercent.textContent = `${Math.floor((currentFileIndex / totalFiles) * 100)}%`;
+
+                // 下载当前文件
+                setTimeout(() => {
+                    // 创建下载链接
+                    const link = document.createElement('a');
+                    link.href = fileUrl;
+                    link.download = fileName;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+
+                    // 更新按钮状态
+                    btn.innerHTML = `
+                        <div class="file-info">
+                            <i class="fas fa-check"></i>
+                            <span>${fileName.split('.')[0]}（已下载）</span>
+                        </div>
+                        <span class="file-size">${fileSize}</span>
+                    `;
+                    btn.style.background = 'rgba(72, 187, 120, 0.2)';
+                    btn.style.borderColor = '#48bb78';
+
+                    // 继续下载下一个
+                    currentFileIndex++;
+                    downloadNextFile();
+                }, 1000);
+            }
+
+            // 开始批量下载
+            downloadNextFile();
+        }
+
+        // 根据文件名获取图标类型
+        function getFileIconType(fileName) {
+            if (fileName.endsWith('.zip') || fileName.endsWith('.rar')) {
+                return 'archive';
+            } else if (fileName.endsWith('.exe')) {
+                return 'exe';
+            } else if (fileName.endsWith('.pdf')) {
+                return 'pdf';
+            } else if (fileName.endsWith('.jpg') || fileName.endsWith('.png') || fileName.endsWith('.gif')) {
+                return 'image';
+            } else {
+                return 'file';
+            }
+        }
+    </script>
+</body>
+</html>
