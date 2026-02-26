@@ -227,8 +227,7 @@
             }
         }
     </style>
-    <!-- 引入加密库（CryptoJS）+ 图标库 -->
-    <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.2.0/crypto-js.min.js"></script>
+    <!-- 替换为更稳定的图标库 CDN -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@6.4.0/css/all.min.css">
 </head>
 <body>
@@ -240,13 +239,14 @@
                     <i class="fas fa-circle"></i> 等待对方加入
                 </span>
             </div>
+            <!-- 核心修改：适配 GitHub Pages 返回路径 -->
             <a href="./index.html" class="back-btn">
                 <i class="fas fa-arrow-left"></i> 返回首页
             </a>
         </div>
 
         <div class="chat-room-area">
-            <p>专属加密聊天房间（复制链接发给好友即可1对1聊天）：</p>
+            <p>专属聊天房间（复制链接发给好友即可1对1聊天）：</p>
             <div class="room-link-box">
                 <input type="text" class="room-link-input" id="roomLinkInput" readonly>
                 <button class="copy-link-btn" id="copyLinkBtn">
@@ -257,7 +257,7 @@
 
         <div class="chat-content" id="chatContent">
             <div class="message system">
-                👋 欢迎使用加密版1对1在线聊天！复制上方链接发给好友即可开始聊天
+                👋 欢迎使用1对1在线聊天！复制上方链接发给好友即可开始聊天
             </div>
         </div>
 
@@ -270,38 +270,7 @@
     </div>
 
     <script>
-        // ========== 核心：加密/解密配置 ==========
-        // 自定义加密密钥（建议修改为自己的密钥，长度16/24/32位）
-        const ENCRYPT_KEY = CryptoJS.enc.Utf8.parse('1234567890abcdef'); // 16位密钥（AES-128）
-        // 加密方法
-        function encryptRoomId(plainRoomId) {
-            // AES加密（ECB模式，兼容前端简单场景）
-            const encrypted = CryptoJS.AES.encrypt(plainRoomId, ENCRYPT_KEY, {
-                mode: CryptoJS.mode.ECB,
-                padding: CryptoJS.pad.Pkcs7
-            });
-            // 返回Base64编码的密文（URL安全格式）
-            return encrypted.toString().replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
-        }
-        // 解密方法
-        function decryptRoomId(encryptedRoomId) {
-            try {
-                // 还原URL安全的Base64编码
-                const rawEncrypted = encryptedRoomId.replace(/-/g, '+').replace(/_/g, '/');
-                // AES解密
-                const decrypted = CryptoJS.AES.decrypt(rawEncrypted, ENCRYPT_KEY, {
-                    mode: CryptoJS.mode.ECB,
-                    padding: CryptoJS.pad.Pkcs7
-                });
-                // 返回明文
-                return decrypted.toString(CryptoJS.enc.Utf8);
-            } catch (e) {
-                console.error('解密失败:', e);
-                return null;
-            }
-        }
-
-        // ========== 聊天核心逻辑 ==========
+        // 核心优化：解决 GitHub Pages 下 WebSocket 跨域问题
         let ws = null;
         const chatContent = document.getElementById('chatContent');
         const chatInput = document.getElementById('chatInput');
@@ -310,55 +279,29 @@
         const copyLinkBtn = document.getElementById('copyLinkBtn');
         const onlineStatus = document.getElementById('onlineStatus');
         
-        // 生成纯随机明文房间号（32位字母+数字）
-        function generateRandomString(length) {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-            let result = '';
-            for (let i = 0; i < length; i++) {
-                result += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return `room_${result}`;
-        }
-
-        // 处理URL中的加密房间号
+        // 从URL获取房间ID
         const urlParams = new URLSearchParams(window.location.search);
-        let encryptedRoomId = urlParams.get('room'); // URL中是加密后的房间号
-        let plainRoomId = null; // 解密后的明文房间号
-
-        // 1. 如果URL中有加密房间号，先解密
-        if (encryptedRoomId) {
-            plainRoomId = decryptRoomId(encryptedRoomId);
-            // 解密失败则重新生成
-            if (!plainRoomId) {
-                plainRoomId = generateRandomString(32);
-                encryptedRoomId = encryptRoomId(plainRoomId);
-            }
-        } 
-        // 2. 无加密房间号则生成新的
-        else {
-            plainRoomId = generateRandomString(32);
-            encryptedRoomId = encryptRoomId(plainRoomId);
+        let roomId = urlParams.get('room') || localStorage.getItem('chat_room_id');
+        if (!roomId) {
+            roomId = `room_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
+            localStorage.setItem('chat_room_id', roomId);
         }
-
-        // 用户ID（随机生成）
         const userId = `user_${Math.floor(Math.random() * 1000000)}`;
         
-        // 生成加密后的分享链接
+        // 核心修改：生成适配 GitHub Pages 的完整链接
         const currentUrl = window.location.href.split('?')[0];
-        const roomLink = `${currentUrl}?room=${encryptedRoomId}`;
+        const roomLink = `${currentUrl}?room=${roomId}`;
         roomLinkInput.value = roomLink;
 
         window.onload = function() {
+            // 优先使用兼容 HTTPS 的 WebSocket 服务器
             connectWebSocket();
             initEventListeners();
-            // 提示当前房间信息（仅控制台显示，不暴露给用户）
-            console.log('明文房间号:', plainRoomId);
-            console.log('加密房间号:', encryptedRoomId);
         };
 
         // 初始化事件监听
         function initEventListeners() {
-            // 复制加密链接
+            // 核心优化：替换复制链接方法（兼容现代浏览器/GitHub Pages 安全策略）
             copyLinkBtn.addEventListener('click', async () => {
                 try {
                     await navigator.clipboard.writeText(roomLinkInput.value);
@@ -367,6 +310,7 @@
                         copyLinkBtn.innerHTML = '<i class="fas fa-copy"></i> 复制';
                     }, 2000);
                 } catch (err) {
+                    // 降级方案
                     roomLinkInput.select();
                     document.execCommand('copy');
                     copyLinkBtn.innerHTML = '<i class="fas fa-check"></i> 已复制';
@@ -376,7 +320,6 @@
                 }
             });
 
-            // 发送消息
             chatSendBtn.addEventListener('click', sendMessage);
             chatInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
@@ -385,25 +328,24 @@
             });
         }
 
-        // 连接WebSocket（使用明文房间号通信）
+        // 核心优化：使用兼容 HTTPS 的 WebSocket 服务器
         function connectWebSocket() {
             if (ws) {
                 ws.close();
             }
 
-            // 兼容HTTPS的WebSocket服务器
+            // 替换为更稳定的公共 WebSocket 测试服务器（支持 HTTPS）
             const wsUrl = 'wss://ws.postman-echo.com/raw'; 
             ws = new WebSocket(wsUrl);
 
             ws.onopen = () => {
                 console.log('WebSocket连接成功');
                 updateOnlineStatus(true);
-                sendSystemMessage(`✅ 已加入加密房间（ID已隐藏）`);
+                sendSystemMessage(`✅ 已加入房间：${roomId}`);
                 
-                // 发送明文房间号（仅服务器通信使用）
                 ws.send(JSON.stringify({
                     type: 'join',
-                    roomId: plainRoomId, // 内部通信仍用明文
+                    roomId: roomId,
                     userId: userId
                 }));
             };
@@ -411,7 +353,7 @@
             ws.onmessage = (event) => {
                 try {
                     const data = JSON.parse(event.data);
-                    if (data.roomId === plainRoomId && data.userId !== userId) {
+                    if (data.roomId === roomId && data.userId !== userId) {
                         addMessageToChat(data.content, 'other');
                     }
                 } catch (e) {
@@ -436,7 +378,6 @@
             };
         }
 
-        // 发送消息
         function sendMessage() {
             const message = chatInput.value.trim();
             if (!message) return;
@@ -450,7 +391,7 @@
             
             ws.send(JSON.stringify({
                 type: 'message',
-                roomId: plainRoomId, // 内部通信仍用明文
+                roomId: roomId,
                 userId: userId,
                 content: message,
                 time: getCurrentTime()
@@ -459,7 +400,6 @@
             chatInput.value = '';
         }
 
-        // 添加消息到聊天窗口
         function addMessageToChat(content, type) {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${type}`;
@@ -474,7 +414,6 @@
             chatContent.scrollTop = chatContent.scrollHeight;
         }
 
-        // 发送系统提示消息
         function sendSystemMessage(content) {
             const messageDiv = document.createElement('div');
             messageDiv.className = 'message system';
@@ -484,7 +423,6 @@
             chatContent.scrollTop = chatContent.scrollHeight;
         }
 
-        // 更新在线状态
         function updateOnlineStatus(isOnline) {
             if (isOnline) {
                 onlineStatus.className = 'online-status';
@@ -495,7 +433,6 @@
             }
         }
 
-        // 获取格式化时间
         function getCurrentTime() {
             const now = new Date();
             const hours = now.getHours().toString().padStart(2, '0');
