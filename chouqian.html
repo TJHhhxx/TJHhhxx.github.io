@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>抽签器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .container {
+            text-align: center;
+            background-color: white;
+            padding: 50px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .display-box {
+            width: 300px;
+            height: 150px;
+            border: 3px solid #4CAF50;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            font-weight: bold;
+            color: #4CAF50;
+            margin: 30px auto;
+            background-color: #f9f9f9;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        #startBtn {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        #stopBtn {
+            background-color: #f44336;
+            color: white;
+        }
+
+        #resetBtn {
+            background-color: #2196F3;
+            color: white;
+        }
+
+        button:hover {
+            opacity: 0.9;
+            transform: scale(1.05);
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            opacity: 1;
+        }
+
+        .history {
+            margin-top: 30px;
+            color: #666;
+            font-size: 16px;
+        }
+
+        .drawn-numbers {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>抽签器</h1>
+        <div class="display-box" id="display">0</div>
+        <div class="btn-group">
+            <button id="startBtn">开始抽签</button>
+            <button id="stopBtn" disabled>停止抽签</button>
+            <button id="resetBtn">重置</button>
+        </div>
+        <div class="history">
+            已抽序号：<span class="drawn-numbers" id="history">无</span>
+        </div>
+    </div>
+
+    <script>
+        // 获取页面元素
+        const display = document.getElementById('display');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const historyEl = document.getElementById('history');
+
+        // 抽奖相关变量
+        let timer = null; // 定时器
+        let isRolling = false; // 是否正在滚动
+        let drawnNumbers = []; // 已抽取的序号
+        const totalNumbers = 50; // 总序号数
+
+        // 开始抽奖
+        startBtn.addEventListener('click', () => {
+            // 如果所有序号都抽完了，提示并返回
+            if (drawnNumbers.length >= totalNumbers) {
+                alert('所有序号都已抽取完毕！');
+                return;
+            }
+
+            isRolling = true;
+            startBtn.disabled = true;
+            stopBtn.disabled = false;
+
+            // 开始滚动数字
+            timer = setInterval(() => {
+                // 生成未抽取过的随机数
+                let randomNum;
+                do {
+                    randomNum = Math.floor(Math.random() * totalNumbers) + 1;
+                } while (drawnNumbers.includes(randomNum));
+                
+                display.textContent = randomNum;
+            }, 50); // 滚动速度，数值越小越快
+        });
+
+        // 停止抽奖
+        stopBtn.addEventListener('click', () => {
+            clearInterval(timer);
+            isRolling = false;
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+
+            // 记录抽取的数字
+            const selectedNum = parseInt(display.textContent);
+            drawnNumbers.push(selectedNum);
+            
+            // 更新历史记录
+            historyEl.textContent = drawnNumbers.join('、');
+
+            // 如果抽完所有数字，禁用开始按钮
+            if (drawnNumbers.length >= totalNumbers) {
+                startBtn.disabled = true;
+                alert('所有序号已抽取完毕！');
+            }
+        });
+
+        // 重置抽奖
+        resetBtn.addEventListener('click', () => {
+            clearInterval(timer);
+            isRolling = false;
+            drawnNumbers = [];
+            display.textContent = '0';
+            historyEl.textContent = '无';
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+        });
+    </script>
+</body>
+</html>
